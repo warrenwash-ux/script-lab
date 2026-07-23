@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Script Lab — LMW Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #f6f3ec;
+    --bg-raised: #ffffff;
+    --bg-panel: #f0ece2;
+    --line: #e0dbcc;
+    --text: #2b2a26;
+    --muted: #7b7568;
+    --gold: #b8721e;
+    --gold-hover: #a1631a;
+    --gold-soft: rgba(184,114,30,0.10);
+    --teal: #2f7d70;
+    --teal-soft: rgba(47,125,112,0.10);
+    --red: #b8452f;
+    --red-soft: rgba(184,69,47,0.08);
+    --green: #4d8a54;
+    --shadow: 0 1px 3px rgba(40,35,20,0.06), 0 1px 2px rgba(40,35,20,0.04);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .display{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:0.03em;}
+  button{font-family:inherit;cursor:pointer;}
+  ::-webkit-scrollbar{height:8px;width:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px;}
+
+  #app{display:flex;flex-direction:column;min-height:100vh;}
+
+  header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 20px;border-bottom:1px solid var(--line);background:var(--bg-raised);
+    flex-shrink:0;position:sticky;top:0;z-index:10;
+  }
+  header .brand{display:flex;align-items:center;gap:10px;}
+  header .brand .mark{width:10px;height:10px;background:var(--gold);border-radius:2px;flex-shrink:0;}
+  header h1{font-size:20px;margin:0;font-weight:600;}
+  header .sub{color:var(--muted);font-size:11px;margin-top:2px;}
+  header .actions{display:flex;gap:8px;align-items:center;}
+  .btn{
+    background:var(--bg-panel);border:1px solid var(--line);color:var(--text);
+    padding:8px 14px;border-radius:7px;font-size:13px;font-weight:500;transition:all .15s;
+  }
+  .btn:hover{border-color:#c9c2ac;background:#eae5d8;}
+  .btn.primary{background:var(--gold);border-color:var(--gold);color:#fff;font-weight:600;}
+  .btn.primary:hover{background:var(--gold-hover);}
+  .btn.teal{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:600;}
+  .btn.teal:hover{background:#276b60;}
+  .btn.ghost{background:transparent;border-color:transparent;}
+  .btn.ghost:hover{background:var(--bg-panel);}
+  .btn.danger{color:var(--red);}
+  .btn:disabled{opacity:0.45;cursor:not-allowed;}
+  .btn.small{padding:5px 10px;font-size:12px;}
+  .icon-btn{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--bg-panel);border:1px solid var(--line);font-size:16px;}
+  .icon-btn:hover{background:#eae5d8;}
+
+  nav.tabs{display:flex;gap:2px;padding:0 20px;background:var(--bg-raised);border-bottom:1px solid var(--line);flex-shrink:0;overflow-x:auto;}
+  nav.tabs button{
+    background:none;border:none;color:var(--muted);padding:12px 16px;font-size:13px;font-weight:600;
+    border-bottom:2px solid transparent;letter-spacing:0.02em;white-space:nowrap;
+  }
+  nav.tabs button.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+  main{flex:1;padding:24px;}
+  .container{max-width:1100px;margin:0 auto;}
+
+  .setup-wrap{max-width:640px;margin:32px auto;padding:0 16px;}
+  .setup-card{background:var(--bg-raised);border:1px solid var(--line);border-radius:12px;padding:32px;box-shadow:var(--shadow);}
+  .field{margin-bottom:18px;}
+  .field label{display:block;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;font-weight:600;}
+  input[type=text], input[type=password], textarea, select{
+    width:100%;background:var(--bg-panel);border:1px solid var(--line);color:var(--text);
+    padding:10px 12px;border-radius:7px;font-size:14px;font-family:inherit;
+  }
+  input[type=text]:focus, input[type=password]:focus, textarea:focus, select:focus{outline:2px solid var(--gold-soft);border-color:var(--gold);}
+  textarea{resize:vertical;line-height:1.5;}
+  .format-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .format-opt{background:var(--bg-panel);border:1px solid var(--line);border-radius:8px;padding:12px;text-align:left;color:var(--text);}
+  .format-opt.selected{border-color:var(--gold);background:var(--gold-soft);}
+  .format-opt .name{font-weight:600;font-size:14px;}
+  .format-opt .range{color:var(--muted);font-size:11px;margin-top:2px;}
+
+  .apikey-banner{background:var(--gold-soft);border:1px solid rgba(184,114,30,0.3);border-radius:10px;padding:14px 16px;margin-bottom:20px;font-size:13px;line-height:1.6;}
+  .apikey-banner b{color:var(--gold-hover);}
+  .apikey-banner a{color:var(--gold-hover);}
+
+  .proj-list{display:flex;flex-direction:column;gap:10px;margin-top:6px;}
+  .proj-item{
+    display:flex;justify-content:space-between;align-items:center;background:var(--bg-raised);
+    border:1px solid var(--line);border-radius:10px;padding:14px 16px;box-shadow:var(--shadow);
+  }
+  .proj-item .pname{font-weight:600;font-size:14px;}
+  .proj-item .pmeta{color:var(--muted);font-size:12px;margin-top:2px;}
+  .proj-item .pactions{display:flex;gap:6px;}
+
+  .split{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start;}
+  .card{background:var(--bg-raised);border:1px solid var(--line);border-radius:12px;padding:18px;box-shadow:var(--shadow);}
+  .card h3{margin:0 0 12px;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;font-weight:600;}
+  #scriptText{min-height:420px;font-family:'IBM Plex Mono',monospace;font-size:13px;line-height:1.7;}
+
+  .timecard{padding:18px;}
+  .runtime-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
+  .runtime-big{font-size:32px;font-weight:700;font-family:'IBM Plex Mono',monospace;}
+  .runtime-target{color:var(--muted);font-size:13px;}
+  .bar{height:8px;background:var(--bg-panel);border-radius:4px;overflow:hidden;margin:10px 0 4px;}
+  .bar-fill{height:100%;transition:width .3s;}
+  .status-pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin-top:8px;}
+  .status-over{background:var(--red-soft);color:var(--red);}
+  .status-under{background:var(--bg-panel);color:var(--muted);}
+  .status-good{background:rgba(77,138,84,0.10);color:var(--green);}
+
+  .scene-row{border-bottom:1px solid var(--line);padding:10px 0;font-size:13px;}
+  .scene-row:last-child{border-bottom:none;}
+  .scene-row .sh{display:flex;justify-content:space-between;color:var(--gold-hover);font-weight:600;font-family:'IBM Plex Mono',monospace;font-size:12px;}
+  .scene-row .desc{color:var(--muted);margin-top:3px;font-size:12px;}
+
+  .note-block{background:var(--bg-panel);border-left:3px solid var(--gold);padding:12px 14px;margin-bottom:10px;border-radius:0 8px 8px 0;font-size:13px;line-height:1.6;}
+
+  .spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,0.15);border-top-color:currentColor;border-radius:50%;animation:sp 0.7s linear infinite;vertical-align:middle;margin-right:6px;}
+  @keyframes sp{to{transform:rotate(360deg);}}
+
+  .sb-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+  .filmstrip{display:flex;gap:16px;overflow-x:auto;padding:8px 4px 20px;}
+  .panel-card{flex:0 0 260px;background:var(--bg-raised);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);}
+  .panel-img{height:150px;background:var(--bg-panel);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;position:relative;overflow:hidden;border-bottom:1px solid var(--line);}
+  .panel-img img{width:100%;height:100%;object-fit:cover;}
+  .panel-num{position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.55);color:#f5d999;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:2px 7px;border-radius:5px;}
+  .panel-dur{position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.55);color:#fff;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:2px 7px;border-radius:5px;}
+  .panel-body{padding:12px;}
+  .panel-body textarea{min-height:60px;font-size:12px;margin-bottom:8px;}
+  .char-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
+  .char-tag{background:var(--teal-soft);color:var(--teal);font-size:11px;padding:3px 8px;border-radius:12px;display:flex;align-items:center;gap:5px;}
+  .char-tag button{background:none;border:none;color:var(--teal);padding:0;font-size:13px;line-height:1;}
+  .panel-actions{display:flex;gap:6px;margin-top:8px;}
+  .add-char-select{font-size:11px;padding:5px 8px;}
+
+  .char-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;}
+  .char-card{background:var(--bg-raised);border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center;box-shadow:var(--shadow);}
+  .char-thumb{width:100%;aspect-ratio:1;border-radius:8px;background:var(--bg-panel);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:11px;overflow:hidden;margin-bottom:8px;}
+  .char-thumb img{width:100%;height:100%;object-fit:cover;}
+  .char-card .cname{font-weight:600;font-size:13px;}
+  .char-card .crole{color:var(--muted);font-size:11px;margin-bottom:6px;}
+
+  .empty{text-align:center;color:var(--muted);padding:60px 20px;}
+  .empty .display{font-size:16px;color:var(--text);margin-bottom:8px;}
+
+  .modal-overlay{position:fixed;inset:0;background:rgba(30,26,15,0.35);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px;}
+  .modal{background:var(--bg-raised);border:1px solid var(--line);border-radius:12px;padding:24px;width:380px;max-width:100%;box-shadow:0 8px 30px rgba(0,0,0,0.15);}
+  .modal h3{margin-top:0;}
+  .modal .row{display:flex;gap:8px;margin-top:16px;justify-content:flex-end;}
+  .modal p.help{font-size:12px;color:var(--muted);line-height:1.6;margin-top:-8px;margin-bottom:16px;}
+
+  .banner{background:var(--gold-soft);border:1px solid rgba(184,114,30,0.25);border-radius:10px;padding:10px 14px;font-size:12px;color:#6b5326;margin-bottom:16px;line-height:1.5;}
+  .banner b{color:var(--gold-hover);}
+
+  .save-status{font-size:11px;color:var(--muted);}
+
+  .build-notes{background:var(--teal-soft);border-left:3px solid var(--teal);border-radius:0 8px 8px 0;padding:12px 14px;margin-bottom:16px;font-size:13px;line-height:1.6;}
+  .build-notes b{color:var(--teal);}
+
+  .verdict-panel{border:1px solid var(--line);border-radius:10px;padding:16px;background:var(--bg-panel);}
+  .verdict-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.03em;margin-bottom:10px;}
+  .verdict-approve{background:rgba(77,138,84,0.15);color:var(--green);}
+  .verdict-fix{background:var(--gold-soft);color:var(--gold-hover);}
+  .verdict-scrap{background:var(--red-soft);color:var(--red);}
+  .verdict-reasoning{font-size:13px;line-height:1.6;margin-bottom:12px;}
+  .verdict-alt{font-size:13px;line-height:1.6;margin-bottom:12px;font-style:italic;color:var(--muted);}
+  #draftResults textarea{min-height:100px;font-size:13px;margin-bottom:10px;background:var(--bg-raised);}
+  .placement-row{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;}
+  .placement-row label{font-size:12px;color:var(--muted);font-weight:600;white-space:nowrap;}
+  .placement-row select{flex:1;min-width:160px;}
+  .draft-actions{display:flex;gap:8px;flex-wrap:wrap;}
+
+  .section-card{margin-bottom:18px;}
+  .section-card h3{margin-bottom:2px;}
+  .section-desc{color:var(--muted);font-size:12px;margin:0 0 10px;line-height:1.5;}
+  .section-questions{margin:0 0 12px;padding-left:18px;font-size:12px;color:var(--muted);line-height:1.7;}
+  .compile-bar{background:var(--gold-soft);border:1px solid rgba(184,114,30,0.25);border-radius:10px;padding:16px;margin-top:8px;}
+
+  @media (max-width:800px){
+    .split{grid-template-columns:1fr;}
+    header h1{font-size:16px;}
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+const FORMATS = [
+  {id:'feature', name:'Feature Film', unit:'minutes', presets:[90,100,110,120], defaultTarget:100},
+  {id:'series', name:'Series Episode', unit:'minutes', presets:[11,22,30,42], defaultTarget:22},
+  {id:'trailer', name:'Trailer / Promo', unit:'seconds', presets:[30,60,90,150], defaultTarget:90},
+  {id:'ad', name:'Ad / Commercial', unit:'seconds', presets:[15,30,60], defaultTarget:30},
+];
+const MODELS = [
+  {id:'claude-sonnet-5', label:'Claude Sonnet 5 (recommended — fast & sharp)'},
+  {id:'claude-opus-4-8', label:'Claude Opus 4.8 (most capable, slower)'},
+  {id:'claude-haiku-4-5-20251001', label:'Claude Haiku 4.5 (fastest, lightest)'},
+  {id:'claude-fable-5', label:'Claude Fable 5 (top tier)'},
+];
+const SECTION_TEMPLATES = {
+  full: [
+    {key:'premise', title:'Premise & Logline', desc:'The core pitch — what this story is about at its heart.', questions:['What does the character want in this story specifically?','What stands in their way?','What happens if they fail — or succeed?']},
+    {key:'setup', title:'World & Setup', desc:'Ordinary life before the story kicks in.', questions:['Where do we start, and what does a normal day look like?','Who do we meet first, and what does that show about the character?']},
+    {key:'inciting', title:'Inciting Incident', desc:'The event that disrupts the ordinary world and kicks the plot into motion. This is often where origin material lives — but only the slice this story needs.', questions:['What happens that changes everything?','How does the character first react?','How much of the full origin does THIS story actually need to show?']},
+    {key:'rising', title:'Rising Action & Obstacles', desc:'Complications that raise the stakes as the story develops.', questions:['What goes wrong along the way?','What choices force the character to grow or change?','Who helps, who hinders?']},
+    {key:'midpoint', title:'Midpoint Turn', desc:'A twist, reveal, or setback that shifts the direction of the story.', questions:['What new information or event changes the game?','How do the stakes get bigger from here?']},
+    {key:'climax', title:'Climax', desc:'The final confrontation or biggest scene of the story.', questions:['What is the final obstacle?','How does the character use what they\'ve learned to face it?']},
+    {key:'resolution', title:'Resolution', desc:'How it wraps up, and what has changed.', questions:['What is different for the character or world now?','If this is part of a series, what seeds get planted for next time?']}
+  ],
+  short: [
+    {key:'hook', title:'Hook', desc:'The first few seconds that grab attention.', questions:['What image, line, or moment opens this?']},
+    {key:'tease', title:'Tone & Stakes Tease', desc:"What this is about and why it matters, without giving everything away.", questions:['What do we want the audience to feel?','What\'s the one thing we tease without fully revealing?']},
+    {key:'cta', title:'Title Card / Call to Action', desc:'How it closes and what the audience should feel or do after.', questions:['What\'s the final image, line, or tag?']}
+  ]
+};
+function sectionsForFormat(){
+  return (state.formatId==='trailer' || state.formatId==='ad') ? SECTION_TEMPLATES.short : SECTION_TEMPLATES.full;
+}
+
+const LS_KEY_PROJECTS = 'scriptlab_projects_v1';
+const LS_KEY_APIKEY = 'scriptlab_api_key';
+const LS_KEY_MODEL = 'scriptlab_model';
+
+let projects = {};   // id -> project
+let state = null;    // active project
+let view = 'home';   // 'home' | 'project'
+
+function loadAll(){
+  try{ projects = JSON.parse(localStorage.getItem(LS_KEY_PROJECTS) || '{}'); }catch(e){ projects = {}; }
+}
+function persistAll(){
+  try{
+    localStorage.setItem(LS_KEY_PROJECTS, JSON.stringify(projects));
+    return true;
+  }catch(e){ console.warn('Local save failed', e); return false; }
+}
+function getApiKey(){ return localStorage.getItem(LS_KEY_APIKEY) || ''; }
+function setApiKey(k){ localStorage.setItem(LS_KEY_APIKEY, k); }
+function getModel(){ return localStorage.getItem(LS_KEY_MODEL) || MODELS[0].id; }
+function setModel(m){ localStorage.setItem(LS_KEY_MODEL, m); }
+
+let saveTimer = null;
+function saveProject(){
+  if(!state) return;
+  state.updatedAt = Date.now();
+  projects[state.id] = state;
+  const statusEl = document.getElementById('saveStatus');
+  if(statusEl) statusEl.textContent = 'saving…';
+  if(saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(()=>{
+    const ok = persistAll();
+    const el = document.getElementById('saveStatus');
+    if(el) el.textContent = ok ? 'saved' : 'save failed';
+  }, 500);
+}
+
+function newProject(formatId, title, target){
+  const fmt = FORMATS.find(f=>f.id===formatId);
+  return {
+    id: 'proj_' + Date.now(),
+    title: title || 'Untitled Project',
+    formatId,
+    targetSeconds: fmt.unit==='minutes' ? target*60 : target,
+    script: '',
+    scenes: [],
+    characters: [],
+    panels: [],
+    notes: [],
+    storylineIdeas: [],
+    liveSuggestions: true,
+    bible: {name:'', identity:'', personality:'', powers:'', cast:'', tone:'', themes:'', notes:''},
+    sections: {},
+    seriesEpisodes: [],
+    activeTab: 'script',
+    createdAt: Date.now(),
+    updatedAt: Date.now()
+  };
+}
+
+function fmtTime(sec){
+  sec = Math.max(0, Math.round(sec));
+  const m = Math.floor(sec/60), s = sec%60;
+  return m + ':' + String(s).padStart(2,'0');
+}
+function estimateSceneDuration(scene){
+  const words = (scene.action||'').split(/\s+/).filter(Boolean).length + (scene.dialogue||'').split(/\s+/).filter(Boolean).length*1.3;
+  return Math.max(3, Math.round(words / 2.2));
+}
+function totalRuntime(){
+  return state.scenes.reduce((sum,s)=> sum + (s.duration || estimateSceneDuration(s)), 0);
+}
+function relTime(ts){
+  const diff = Date.now() - ts;
+  const mins = Math.floor(diff/60000);
+  if(mins < 1) return 'just now';
+  if(mins < 60) return mins + 'm ago';
+  const hrs = Math.floor(mins/60);
+  if(hrs < 24) return hrs + 'h ago';
+  const days = Math.floor(hrs/24);
+  if(days < 30) return days + 'd ago';
+  return new Date(ts).toLocaleDateString();
+}
+
+function ensureBibleDefaults(p){
+  if(!p.bible) p.bible = {name:'', identity:'', personality:'', powers:'', cast:'', tone:'', themes:'', notes:''};
+  if(!p.sections) p.sections = {};
+  if(!p.seriesEpisodes) p.seriesEpisodes = [];
+  return p;
+}
+function bibleContextBlock(){
+  if(!state.bible) return '';
+  const b = state.bible;
+  const parts = [];
+  if(b.name) parts.push(`Character/Project: ${b.name}`);
+  if(b.identity) parts.push(`Identity: ${b.identity}`);
+  if(b.personality) parts.push(`Personality & voice: ${b.personality}`);
+  if(b.powers) parts.push(`Powers/gadgets & rules: ${b.powers}`);
+  if(b.cast) parts.push(`Supporting cast: ${b.cast}`);
+  if(b.tone) parts.push(`Tone & demographic: ${b.tone}`);
+  if(b.themes) parts.push(`Themes/values: ${b.themes}`);
+  if(b.notes) parts.push(`Other notes: ${b.notes}`);
+  if(!parts.length) return '';
+  return `CHARACTER BIBLE — stay consistent with this at all times:\n${parts.join('\n')}\n\n`;
+}
+
+// ---------- Claude API ----------
+async function callClaude(systemPrompt, userPrompt, maxTokens){
+  const key = getApiKey();
+  if(!key){ throw new Error('No API key set. Click "API Key" in the header to add one.'); }
+  let res;
+  try{
+    res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: getModel(),
+        max_tokens: maxTokens || 1000,
+        system: systemPrompt,
+        messages: [{role:'user', content: userPrompt}]
+      })
+    });
+  }catch(networkErr){
+    throw new Error('Network request failed — check your connection and try again.');
+  }
+  let raw;
+  try{ raw = await res.text(); }catch(readErr){ throw new Error(`Could not read API response (status ${res.status}).`); }
+  let data;
+  try{ data = JSON.parse(raw); }catch(parseErr){
+    console.warn('callClaude: non-JSON response', {status: res.status, body: raw.slice(0,500)});
+    throw new Error(`API returned an unreadable response (status ${res.status}).`);
+  }
+  if(!res.ok || data.error){
+    console.warn('callClaude: API error', data);
+    const msg = (data.error && data.error.message) || `API error (status ${res.status})`;
+    if(res.status === 401) throw new Error('API key rejected (401) — check the key in Settings.');
+    throw new Error(msg);
+  }
+  const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n');
+  if(!text) throw new Error('Empty response from API — try again.');
+  return text;
+}
+function safeParseJSON(text){
+  let t = text.trim().replace(/^```json/i,'').replace(/^```/,'').replace(/```$/,'').trim();
+  try{ return JSON.parse(t); }catch(e){
+    const m = t.match(/\[[\s\S]*\]|\{[\s\S]*\}/);
+    if(m){ try{ return JSON.parse(m[0]); }catch(e2){} }
+    return null;
+  }
+}
+
+// ---------- Render root ----------
+function render(){
+  const app = document.getElementById('app');
+  if(view==='home'){ app.innerHTML = renderHome(); attachHomeHandlers(); return; }
+  app.innerHTML = renderProject();
+  attachProjectHandlers();
+}
+
+function renderApiKeyBanner(){
+  if(getApiKey()) return '';
+  return `
+  <div class="apikey-banner">
+    <b>Add your Anthropic API key to turn on AI features.</b> Script Lab runs entirely in your browser — your key is stored only in this browser's local storage and is sent directly to Anthropic's API, never through any third-party server.
+    Get a key at <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a>, then click <b>API Key</b> above.
+  </div>`;
+}
+
+function renderHome(){
+  const list = Object.values(projects).sort((a,b)=>b.updatedAt-a.updatedAt);
+  return `
+  <header>
+    <div class="brand"><div class="mark"></div><h1>Script Lab</h1></div>
+    <div class="actions">
+      <button class="btn small" id="apiKeyBtn">${getApiKey() ? '🔑 API Key ✓' : '🔑 API Key'}</button>
+    </div>
+  </header>
+  <main><div class="setup-wrap">
+    ${renderApiKeyBanner()}
+    <div class="setup-card">
+      <h2 class="display" style="margin-top:0;font-size:22px;">New Project</h2>
+      <p style="color:var(--muted);font-size:13px;margin-top:-8px;">Format, review, edit, and storyboard your movies, series, trailers, and ads — built to fit your runtime.</p>
+      <div class="field">
+        <label>Project Title</label>
+        <input type="text" id="setupTitle" placeholder="e.g. Zeke Zoom — Episode One">
+      </div>
+      <div class="field">
+        <label>Format</label>
+        <div class="format-grid" id="formatGrid">
+          ${FORMATS.map((f,i)=>`
+            <button class="format-opt ${i===0?'selected':''}" data-format="${f.id}">
+              <div class="name">${f.name}</div>
+              <div class="range">${f.presets.map(p=>p+(f.unit==='minutes'?'m':'s')).join(' · ')}</div>
+            </button>`).join('')}
+        </div>
+      </div>
+      <div class="field">
+        <label>Target Runtime</label>
+        <select id="setupTarget"></select>
+      </div>
+      <button class="btn primary" id="createProjectBtn" style="width:100%;padding:12px;">Start Project</button>
+    </div>
+    ${list.length ? `
+    <h3 class="display" style="font-size:14px;color:var(--muted);margin:28px 0 10px;">Your Projects</h3>
+    <div class="proj-list">
+      ${list.map(p=>{
+        const fmt = FORMATS.find(f=>f.id===p.formatId);
+        return `
+        <div class="proj-item">
+          <div>
+            <div class="pname">${p.title}</div>
+            <div class="pmeta">${fmt.name} · ${relTime(p.updatedAt)}</div>
+          </div>
+          <div class="pactions">
+            <button class="btn small" data-open="${p.id}">Open</button>
+            <button class="btn small danger" data-delete="${p.id}">Delete</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>` : ''}
+  </div></main>`;
+}
+
+function attachHomeHandlers(){
+  document.getElementById('apiKeyBtn').addEventListener('click', showApiKeyModal);
+  let selectedFormat = FORMATS[0].id;
+  function refreshTargetOptions(){
+    const f = FORMATS.find(x=>x.id===selectedFormat);
+    const sel = document.getElementById('setupTarget');
+    sel.innerHTML = f.presets.map(p=>`<option value="${p}" ${p===f.defaultTarget?'selected':''}>${p} ${f.unit==='minutes'?'minutes':'seconds'}</option>`).join('')
+      + `<option value="custom">Custom…</option>`;
+  }
+  refreshTargetOptions();
+  document.querySelectorAll('.format-opt').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.format-opt').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedFormat = btn.dataset.format;
+      refreshTargetOptions();
+    });
+  });
+  document.getElementById('createProjectBtn').addEventListener('click', ()=>{
+    const title = document.getElementById('setupTitle').value.trim();
+    let target = document.getElementById('setupTarget').value;
+    if(target === 'custom'){
+      const f = FORMATS.find(x=>x.id===selectedFormat);
+      const val = prompt(`Enter target runtime in ${f.unit}:`, f.defaultTarget);
+      target = parseFloat(val) || f.defaultTarget;
+    } else { target = parseFloat(target); }
+    state = newProject(selectedFormat, title, target);
+    projects[state.id] = state;
+    persistAll();
+    view = 'project';
+    render();
+  });
+  document.querySelectorAll('[data-open]').forEach(el=>{
+    el.addEventListener('click', ()=>{ state = ensureBibleDefaults(projects[el.dataset.open]); view='project'; render(); });
+  });
+  document.querySelectorAll('[data-delete]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const p = projects[el.dataset.delete];
+      if(confirm(`Delete "${p.title}"? This can't be undone.`)){
+        delete projects[el.dataset.delete];
+        persistAll();
+        render();
+      }
+    });
+  });
+}
+
+function showApiKeyModal(){
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal">
+      <h3>API Key &amp; Model</h3>
+      <p class="help">Stored only in this browser (localStorage). Never sent anywhere except directly to Anthropic's API.</p>
+      <div class="field">
+        <label>Anthropic API Key</label>
+        <input type="password" id="apiKeyInput" placeholder="sk-ant-…" value="${getApiKey()}">
+      </div>
+      <div class="field">
+        <label>Model</label>
+        <select id="modelSelect">
+          ${MODELS.map(m=>`<option value="${m.id}" ${getModel()===m.id?'selected':''}>${m.label}</option>`).join('')}
+        </select>
+      </div>
+      <div class="row">
+        <button class="btn small" id="cancelKey">Cancel</button>
+        <button class="btn primary small" id="saveKey">Save</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  document.getElementById('cancelKey').addEventListener('click', ()=> overlay.remove());
+  document.getElementById('saveKey').addEventListener('click', ()=>{
+    setApiKey(document.getElementById('apiKeyInput').value.trim());
+    setModel(document.getElementById('modelSelect').value);
+    overlay.remove();
+    render();
+  });
+}
+
+// ---------- Project view ----------
+function renderProject(){
+  const fmt = FORMATS.find(f=>f.id===state.formatId);
+  const targetDisplay = fmt.unit==='minutes' ? fmtTime(state.targetSeconds) : Math.round(state.targetSeconds)+'s';
+  return `
+  <header>
+    <div>
+      <div class="brand">
+        <button class="icon-btn ghost" id="homeBtn" title="Back to projects" style="margin-right:2px;">←</button>
+        <div class="mark"></div>
+        <h1>${state.title}</h1>
+      </div>
+      <div class="sub">${fmt.name} · Target ${targetDisplay} · <span id="saveStatus" class="save-status">saved</span></div>
+    </div>
+    <div class="actions">
+      <button class="btn small" id="apiKeyBtn">🔑</button>
+      <button class="btn small" id="exportBtn">Export</button>
+    </div>
+  </header>
+  <nav class="tabs">
+    ${['bible','structure','script','review','storyboard','characters'].map(t=>`
+      <button data-tab="${t}" class="${state.activeTab===t?'active':''}">${t}</button>
+    `).join('')}
+  </nav>
+  <main><div class="container" id="tabContent">
+    ${renderApiKeyBanner()}
+    ${renderTab()}
+  </div></main>`;
+}
+
+function renderTab(){
+  if(state.activeTab==='bible') return renderBibleTab();
+  if(state.activeTab==='structure') return renderStructureTab();
+  if(state.activeTab==='script') return renderScriptTab();
+  if(state.activeTab==='review') return renderReviewTab();
+  if(state.activeTab==='storyboard') return renderStoryboardTab();
+  if(state.activeTab==='characters') return renderCharactersTab();
+}
+
+function renderBibleTab(){
+  const b = state.bible;
+  return `
+  <div class="banner"><b>What this is:</b> your character/project reference sheet — identity, voice, powers, cast, tone. It never gets dumped into the script itself; instead every AI feature (Format, Review, Story Draft, Storyline Ideas) reads it quietly in the background so the writing stays consistent without you re-explaining your world every time.</div>
+  <div class="card">
+    <h3>Identity</h3>
+    <div class="field"><label>Name</label><input type="text" id="bibleName" value="${b.name||''}" placeholder="e.g. Zeke Zoom (Ezekiel Warren Lamb)"></div>
+    <div class="field"><label>Age, Ethnicity, Hometown, Family</label><textarea id="bibleIdentity" style="min-height:70px;" placeholder="e.g. 12 years old, Black, from the Bronx, lives with his mom">${b.identity||''}</textarea></div>
+    <div class="field"><label>Personality &amp; Voice</label><textarea id="biblePersonality" style="min-height:70px;" placeholder="e.g. Never stops talking or singing — narrates his own life in real time. His one moment of silence is the loudest beat in any scene.">${b.personality||''}</textarea></div>
+  </div>
+  <div class="card" style="margin-top:20px;">
+    <h3>Powers, Gadgets &amp; Rules</h3>
+    <div class="field"><textarea id="biblePowers" style="min-height:90px;" placeholder="What can they do, what can't they do, what are the limits/costs?">${b.powers||''}</textarea></div>
+  </div>
+  <div class="card" style="margin-top:20px;">
+    <h3>Supporting Cast &amp; Relationships</h3>
+    <div class="field"><textarea id="bibleCast" style="min-height:90px;" placeholder="Key people (and non-people) in their world, and how they relate">${b.cast||''}</textarea></div>
+  </div>
+  <div class="card" style="margin-top:20px;">
+    <h3>Tone, Demographic &amp; Rating</h3>
+    <div class="field"><textarea id="bibleTone" style="min-height:70px;" placeholder="e.g. Ages 8-12, Bluey/Daniel Tiger tone, Pixar/Big Hero 6 quality target, No Cuss No Fuss">${b.tone||''}</textarea></div>
+  </div>
+  <div class="card" style="margin-top:20px;">
+    <h3>Themes &amp; Values</h3>
+    <div class="field"><textarea id="bibleThemes" style="min-height:70px;" placeholder="What this story is really about underneath the plot">${b.themes||''}</textarea></div>
+  </div>
+  <div class="card" style="margin-top:20px;">
+    <h3>Other Notes</h3>
+    <div class="field"><textarea id="bibleNotes" style="min-height:90px;" placeholder="Origin summary, visual design notes, anything else worth keeping consistent">${b.notes||''}</textarea></div>
+  </div>`;
+}
+function attachBibleHandlers(){
+  const map = {bibleName:'name', bibleIdentity:'identity', biblePersonality:'personality', biblePowers:'powers', bibleCast:'cast', bibleTone:'tone', bibleThemes:'themes', bibleNotes:'notes'};
+  Object.keys(map).forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.addEventListener('input', ()=>{ state.bible[map[id]] = el.value; saveProject(); });
+  });
+}
+
+function renderStructureTab(){
+  const sections = sectionsForFormat();
+  const fmt = FORMATS.find(f=>f.id===state.formatId);
+  return `
+  <div class="banner"><b>How this works:</b> work through each stage below in any order — jot notes, bullet points, or full paragraphs, whatever's easiest. Tap "Get Ideas" on any section if you're stuck. When enough is filled in, Compile weaves it all into a full draft, in script format or prose, using your Character Bible to stay consistent.</div>
+  ${sections.map(sec=>`
+    <div class="card section-card">
+      <h3>${sec.title}</h3>
+      <p class="section-desc">${sec.desc}</p>
+      <ul class="section-questions">${sec.questions.map(q=>`<li>${q}</li>`).join('')}</ul>
+      <textarea data-section="${sec.key}" style="min-height:90px;font-size:13px;" placeholder="Your notes for this part…">${state.sections[sec.key]||''}</textarea>
+      <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
+        <button class="btn small" data-sectionideas="${sec.key}"><span data-sectionideaslabel="${sec.key}">Get Ideas</span></button>
+      </div>
+      <div data-sectionresult="${sec.key}" style="margin-top:10px;"></div>
+    </div>
+  `).join('')}
+  <div class="compile-bar">
+    <h3 style="margin:0 0 8px;">Adapt This Story</h3>
+    <p style="color:var(--muted);font-size:12px;margin:0 0 14px;line-height:1.5;">One story, multiple destinations. Each button pulls from everything filled in above plus your Character Bible — same foundation, shaped for a different medium.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+      <button class="btn primary" id="adaptMovieBtn"><span id="adaptMovieLabel">🎬 Movie / Feature Script</span></button>
+      <button class="btn teal" id="adaptSeriesBtn"><span id="adaptSeriesLabel">📺 TV Series (Episode Breakdown)</span></button>
+      <button class="btn" id="adaptBookBtn"><span id="adaptBookLabel">📖 Children's Book</span></button>
+      <button class="btn" id="adaptComicBtn"><span id="adaptComicLabel">💥 Comic Book</span></button>
+    </div>
+    <div id="adaptError"></div>
+    <div id="seriesBreakdown" style="margin-top:14px;">${renderSeriesBreakdownHTML()}</div>
+  </div>`;
+}
+function renderSeriesBreakdownHTML(){
+  if(!state.seriesEpisodes || !state.seriesEpisodes.length) return '';
+  return state.seriesEpisodes.map((ep,i)=>`
+    <div class="build-option" style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;background:var(--bg-raised);">
+      <div style="font-weight:600;font-size:13px;margin-bottom:6px;">Episode ${i+1}: ${ep.title}</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:8px;line-height:1.5;">${ep.synopsis}</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5;"><i>${ep.keyBeats||''}</i></div>
+      <button class="btn primary small" data-writeepisode="${i}"><span data-writeepisodelabel="${i}">Write Full Script for This Episode</span></button>
+    </div>
+  `).join('');
+}
+
+function attachStructureHandlers(){
+  document.querySelectorAll('[data-section]').forEach(el=>{
+    el.addEventListener('input', ()=>{ state.sections[el.dataset.section] = el.value; saveProject(); });
+  });
+  document.querySelectorAll('[data-sectionideas]').forEach(el=>{
+    el.addEventListener('click', ()=> getSectionIdeas(el.dataset.sectionideas));
+  });
+  document.getElementById('adaptMovieBtn').addEventListener('click', ()=> adaptStory('movie'));
+  document.getElementById('adaptBookBtn').addEventListener('click', ()=> adaptStory('book'));
+  document.getElementById('adaptComicBtn').addEventListener('click', ()=> adaptStory('comic'));
+  document.getElementById('adaptSeriesBtn').addEventListener('click', ()=> generateSeriesBreakdown());
+  wireEpisodeButtons();
+}
+
+async function getSectionIdeas(key){
+  const sections = sectionsForFormat();
+  const sec = sections.find(s=>s.key===key);
+  const labelEl = document.querySelector(`[data-sectionideaslabel="${key}"]`);
+  const resultEl = document.querySelector(`[data-sectionresult="${key}"]`);
+  labelEl.innerHTML = '<span class="spin"></span>Thinking…';
+  const fmt = FORMATS.find(f=>f.id===state.formatId);
+  const otherContext = Object.keys(state.sections).filter(k=>k!==key && state.sections[k]).map(k=>{
+    const s = sections.find(x=>x.key===k);
+    return s ? `${s.title}: ${state.sections[k]}` : '';
+  }).filter(Boolean).join('\n');
+  const sys = bibleContextBlock() + `You are a story editor helping develop a ${fmt.name.toLowerCase()}. The writer is working on the "${sec.title}" stage of their story: ${sec.desc} Guiding questions for this stage: ${sec.questions.join(' ')}
+Give 3 short, specific, distinct suggestions for this section — one or two sentences each — that fit what's already been established elsewhere in the story. Respond ONLY with a JSON array of 3 strings, no preamble, no markdown fences.`;
+  const userMsg = `WHAT'S ALREADY ESTABLISHED IN OTHER SECTIONS:\n${otherContext || '(nothing yet)'}\n\nCURRENT NOTES FOR "${sec.title}":\n${state.sections[key] || '(empty so far)'}`;
+  try{
+    const out = await callClaude(sys, userMsg, 500);
+    let parsed = safeParseJSON(out);
+    if(!Array.isArray(parsed) || !parsed.length){
+      const lines = out.split('\n').map(l=>l.replace(/^[\s\-\*\d\.\)]+/,'').trim()).filter(l=>l.length>8);
+      if(lines.length) parsed = lines.slice(0,3);
+    }
+    if(Array.isArray(parsed) && parsed.length){
+      resultEl.innerHTML = parsed.map((idea,i)=>`
+        <div class="note-block" style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
+          <span style="flex:1;">${idea}</span>
+          <button class="btn small teal" data-useidea="${key}::${i}">Insert</button>
+        </div>`).join('');
+      resultEl.querySelectorAll('[data-useidea]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const idea = parsed[parseInt(btn.dataset.useidea.split('::')[1])];
+          const ta = document.querySelector(`[data-section="${key}"]`);
+          state.sections[key] = (state.sections[key] ? state.sections[key] + '\n' : '') + idea;
+          ta.value = state.sections[key];
+          saveProject();
+        });
+      });
+    } else {
+      resultEl.innerHTML = '<p style="color:var(--red);font-size:12px;">Got a response I could not read. Try again.</p>';
+    }
+  }catch(e){
+    resultEl.innerHTML = `<p style="color:var(--red);font-size:12px;">${e.message}</p>`;
+  }
+  labelEl.textContent = 'Get Ideas';
+}
+
+function gatherSectionText(){
+  const sections = sectionsForFormat();
+  const filled = sections.filter(s=>state.sections[s.key] && state.sections[s.key].trim());
+  return {filled, text: filled.map(s=>`${s.title}:\n${state.sections[s.key]}`).join('\n\n')};
+}
+
+const ADAPT_STYLES = {
+  movie: {label:'Movie / Feature Script', instruction:`Write this in clean industry-standard screenplay format for a feature film — scene headings (INT./EXT. LOCATION - TIME), action lines, character cues, dialogue.`},
+  book: {label:"Children's Book", instruction:`Write this as a children's chapter book (age-appropriate to the tone/demographic in the Character Bible) — narrative prose in short chapters, simple vivid sentences, dialogue in prose form, chapter headings like "Chapter 1: ...".`},
+  comic: {label:'Comic Book', instruction:`Write this as a comic book script for an artist to draw from — organized by page and panel (PAGE 1, PANEL 1: visual description... CAPTION: ... [CHARACTER]: "dialogue"), tight pacing, a handful of panels per page, clear panel-by-panel visual direction.`}
+};
+
+async function adaptStory(styleKey){
+  const {filled, text} = gatherSectionText();
+  const errEl = document.getElementById('adaptError');
+  errEl.innerHTML = '';
+  if(!filled.length){ errEl.innerHTML = '<p style="color:var(--red);font-size:12px;">Fill in at least one section above first.</p>'; return; }
+  const style = ADAPT_STYLES[styleKey];
+  const labelEl = document.getElementById(`adapt${styleKey.charAt(0).toUpperCase()+styleKey.slice(1)}Label`);
+  const originalLabel = labelEl.innerHTML;
+  labelEl.innerHTML = '<span class="spin"></span>Adapting…';
+  const sys = bibleContextBlock() + `You are a professional writer turning a set of story-stage notes into a complete, cohesive first draft. The notes below cover the story stages in order. Weave them into one continuous, well-paced draft — do not just restate each section as a labeled block, blend them into a flowing story. ${style.instruction} Keep language clean (no profanity), matching the tone in the Character Bible if provided.`;
+  const userMsg = `STORY STAGE NOTES, IN ORDER:\n\n${text}`;
+  try{
+    let out;
+    try{ out = await callClaude(sys, userMsg, 4000); }
+    catch(firstErr){ labelEl.innerHTML = '<span class="spin"></span>Retrying…'; out = await callClaude(sys, userMsg, 4000); }
+    const proceed = !state.script.trim() || confirm(`This will replace what's currently in your Script tab with the ${style.label} draft. Continue? (Your section notes stay untouched either way.)`);
+    if(proceed){
+      state.script = out.trim();
+      state.activeTab = 'script';
+      saveProject();
+      render();
+      return;
+    }
+  }catch(e){
+    errEl.innerHTML = `<p style="color:var(--red);font-size:12px;">Adapt failed twice: ${e.message}. Try again.</p>`;
+  }
+  labelEl.innerHTML = originalLabel;
+}
+
+async function generateSeriesBreakdown(){
+  const {filled, text} = gatherSectionText();
+  const errEl = document.getElementById('adaptError');
+  errEl.innerHTML = '';
+  if(!filled.length){ errEl.innerHTML = '<p style="color:var(--red);font-size:12px;">Fill in at least one section above first.</p>'; return; }
+  const labelEl = document.getElementById('adaptSeriesLabel');
+  const originalLabel = labelEl.innerHTML;
+  labelEl.innerHTML = '<span class="spin"></span>Breaking into episodes…';
+  const breakdownEl = document.getElementById('seriesBreakdown');
+  breakdownEl.innerHTML = '';
+  const sys = bibleContextBlock() + `You are a TV writer breaking a single story into a series. Given the story-stage notes below, split the story into a sensible number of episodes (use your judgment — usually 3-6 for this much material). Each episode should have a clear beginning/middle/end of its own while serving the larger arc. Respond ONLY with JSON, no preamble, no markdown fences:
+{"episodes":[{"title":"...","synopsis":"2-3 sentences","keyBeats":"a few key beats or scenes for this episode"}]}`;
+  const userMsg = `STORY STAGE NOTES, IN ORDER:\n\n${text}`;
+  try{
+    let out;
+    try{ out = await callClaude(sys, userMsg, 2500); }
+    catch(firstErr){ labelEl.innerHTML = '<span class="spin"></span>Retrying…'; out = await callClaude(sys, userMsg, 2500); }
+    const parsed = safeParseJSON(out);
+    if(parsed && Array.isArray(parsed.episodes) && parsed.episodes.length){
+      state.seriesEpisodes = parsed.episodes;
+      saveProject();
+      renderSeriesBreakdown();
+    } else {
+      errEl.innerHTML = '<p style="color:var(--red);font-size:12px;">Got a response I could not read. Try again.</p>';
+    }
+  }catch(e){
+    errEl.innerHTML = `<p style="color:var(--red);font-size:12px;">Breakdown failed twice: ${e.message}. Try again.</p>`;
+  }
+  labelEl.innerHTML = originalLabel;
+}
+
+function renderSeriesBreakdown(){
+  const breakdownEl = document.getElementById('seriesBreakdown');
+  if(!breakdownEl) return;
+  breakdownEl.innerHTML = renderSeriesBreakdownHTML();
+  wireEpisodeButtons();
+}
+function wireEpisodeButtons(){
+  document.querySelectorAll('[data-writeepisode]').forEach(btn=>{
+    btn.addEventListener('click', ()=> writeEpisodeScript(parseInt(btn.dataset.writeepisode)));
+  });
+}
+
+async function writeEpisodeScript(idx){
+  const ep = state.seriesEpisodes[idx];
+  const labelEl = document.querySelector(`[data-writeepisodelabel="${idx}"]`);
+  const originalLabel = labelEl.textContent;
+  labelEl.innerHTML = '<span class="spin"></span>Writing…';
+  const {text} = gatherSectionText();
+  const sys = bibleContextBlock() + `You are a TV writer. Write a full episode script in clean industry-standard format (scene headings, action lines, character cues, dialogue) for the episode described below, as part of a larger series. Use the overall story notes for context and consistency, but write ONLY this one episode, fully realized. Keep language clean (no profanity).`;
+  const userMsg = `OVERALL STORY NOTES (for context/consistency):\n${text}\n\nTHIS EPISODE:\nTitle: ${ep.title}\nSynopsis: ${ep.synopsis}\nKey beats: ${ep.keyBeats||''}`;
+  try{
+    let out;
+    try{ out = await callClaude(sys, userMsg, 4000); }
+    catch(firstErr){ labelEl.innerHTML = '<span class="spin"></span>Retrying…'; out = await callClaude(sys, userMsg, 4000); }
+    const proceed = !state.script.trim() || confirm(`This will replace what's currently in your Script tab with "${ep.title}". Continue?`);
+    if(proceed){
+      state.script = out.trim();
+      state.activeTab = 'script';
+      saveProject();
+      render();
+      return;
+    }
+  }catch(e){
+    alert('Writing this episode failed: ' + e.message);
+  }
+  labelEl.textContent = originalLabel;
+}
+
+function renderScriptTab(){
+  const fmt = FORMATS.find(f=>f.id===state.formatId);
+  const total = totalRuntime();
+  const targetSec = state.targetSeconds;
+  const pct = Math.min(100, (total/targetSec)*100);
+  const diff = total - targetSec;
+  let statusClass = 'status-good', statusText = 'On target', barColor = 'var(--green)';
+  if(Math.abs(diff) > targetSec*0.05){
+    if(diff>0){ statusClass='status-over'; statusText = `Over by ${fmt.unit==='minutes'?fmtTime(diff):Math.round(diff)+'s'}`; barColor='var(--red)'; }
+    else{ statusClass='status-under'; statusText = `Under by ${fmt.unit==='minutes'?fmtTime(-diff):Math.round(-diff)+'s'}`; barColor='var(--muted)'; }
+  }
+  return `
+  <div class="split">
+    <div class="card">
+      <h3>Script</h3>
+      <textarea id="scriptText" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Paste or write your script here. Include scene headings, action, and dialogue — Script Lab will format it and break it into scenes.">${state.script}</textarea>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+        <button class="btn primary" id="draftFromFoundationBtn"><span id="draftFromFoundationLabel">✨ Draft From Bible &amp; Structure</span></button>
+        <button class="btn primary" id="formatBtn"><span id="formatBtnLabel">Format &amp; Break Into Scenes</span></button>
+        <button class="btn teal" id="fitTimeBtn" ${state.scenes.length?'':'disabled'}>Fit to Target Time</button>
+        <button class="btn" id="sendSelectionBtn">Send Selected Text to Story Draft</button>
+      </div>
+      <div id="draftFoundationError" style="margin-top:8px;"></div>
+      ${state.scenes.length ? `
+      <div style="margin-top:20px;">
+        <h3>Scene Breakdown</h3>
+        <div id="sceneList">
+        ${state.scenes.map((s,i)=>`
+          <div class="scene-row">
+            <div class="sh"><span>${s.heading}</span><span>${fmtTime(s.duration)}</span></div>
+            <div class="desc">${(s.action||'').slice(0,140)}${(s.action||'').length>140?'…':''}</div>
+          </div>
+        `).join('')}
+        </div>
+      </div>` : ''}
+    </div>
+    <div class="card timecard">
+      <h3>Time Fit</h3>
+      <div class="runtime-row">
+        <div class="runtime-big mono">${fmt.unit==='minutes'?fmtTime(total):Math.round(total)+'s'}</div>
+        <div class="runtime-target">of ${fmt.unit==='minutes'?fmtTime(targetSec):Math.round(targetSec)+'s'}</div>
+      </div>
+      <div class="bar"><div class="bar-fill" style="width:${pct}%;background:${barColor};"></div></div>
+      <span class="status-pill ${statusClass}">${state.scenes.length ? statusText : 'No scenes yet'}</span>
+      <p style="color:var(--muted);font-size:12px;margin-top:16px;line-height:1.6;">
+        Durations are estimated from dialogue and action pacing. Use <b>Fit to Target Time</b> for AI suggestions on what to trim or expand.
+      </p>
+    </div>
+  </div>
+  <div class="card" style="margin-top:20px;">
+    <h3>Story Draft</h3>
+    <p style="color:var(--muted);font-size:12px;margin:0 0 12px;line-height:1.5;">Pitch a raw idea, a paragraph, or a chunk pulled from your script. Send it for a take — your co-editor will approve it, fix it, or say it should be scrapped, and suggest where it fits. Either way, you decide what actually happens to it.</p>
+    <textarea id="storyDraftInput" placeholder="Drop your idea, paragraph, or dialogue here…" style="min-height:100px;font-size:13px;margin-bottom:10px;"></textarea>
+    <button class="btn primary" id="draftReviewBtn"><span id="draftReviewBtnLabel">Send for a Take</span></button>
+    <div id="draftError" style="margin-top:10px;"></div>
+    <div id="draftResults" style="margin-top:16px;"></div>
+  </div>
+  <div class="card" style="margin-top:20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+      <h3 style="margin:0;">Storyline Ideas</h3>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);">
+        <input type="checkbox" id="liveSuggestToggle" ${state.liveSuggestions?'checked':''}> Suggest as I write
+      </label>
+    </div>
+    <p style="color:var(--muted);font-size:12px;margin:0 0 12px;">Pauses while typing trigger a few quick "what could happen next" ideas. Insert one, or tap Refresh any time.</p>
+    <button class="btn small" id="refreshIdeasBtn" style="margin-bottom:12px;"><span id="refreshIdeasLabel">Refresh Ideas</span></button>
+    <div id="ideasList">
+      ${state.storylineIdeas.length ? state.storylineIdeas.map((idea,i)=>`
+        <div class="note-block" style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
+          <span style="flex:1;">${idea}</span>
+          <button class="btn small teal" data-insertidea="${i}">Insert</button>
+        </div>
+      `).join('') : '<p style="color:var(--muted);font-size:13px;">No ideas yet — keep writing or tap Refresh.</p>'}
+    </div>
+  </div>`;
+}
+
+function renderReviewTab(){
+  if(!state.script.trim()){
+    return `<div class="empty"><div class="display">No script yet</div>Write or paste your script in the Script tab first.</div>`;
+  }
+  return `
+  <div class="split">
+    <div class="card">
+      <h3>Editor's Notes</h3>
+      <div id="notesArea">
+        ${state.notes.length ? state.notes.map(n=>`<div class="note-block">${n}</div>`).join('') : '<p style="color:var(--muted);font-size:13px;">No notes yet. Run a review below.</p>'}
+      </div>
+    </div>
+    <div class="card">
+      <h3>Actions</h3>
+      <button class="btn primary" id="reviewBtn" style="width:100%;margin-bottom:10px;"><span id="reviewBtnLabel">Get Structural Notes</span></button>
+      <button class="btn teal" id="editBtn" style="width:100%;"><span id="editBtnLabel">Let AI Edit My Script</span></button>
+      <p style="color:var(--muted);font-size:12px;margin-top:16px;line-height:1.6;">Notes give feedback without changing your words. Editing rewrites the script directly — your original stays in the field until you accept.</p>
+    </div>
+  </div>`;
+}
+
+function renderStoryboardTab(){
+  if(!state.scenes.length){
+    return `<div class="empty"><div class="display">No scenes yet</div>Format your script in the Script tab to generate storyboard panels.</div>`;
+  }
+  if(!state.panels.length){
+    return `<div class="empty"><div class="display">Ready to build panels</div>
+      <button class="btn primary" id="genPanelsBtn" style="margin-top:12px;">Generate Storyboard Panels</button>
+    </div>`;
+  }
+  let running = 0;
+  return `
+  <div class="banner"><b>Image note:</b> Script Lab can't generate images directly — upload a reference image per panel (a Midjourney/Flux render, CDNA still, or sketch). Tag which characters are in each panel so everyone stays labeled correctly across the board.</div>
+  <div class="sb-toolbar">
+    <div class="mono" style="color:var(--muted);font-size:12px;">${state.panels.length} panels · ${fmtTime(state.panels.reduce((s,p)=>s+p.duration,0))} total</div>
+    <button class="btn small" id="regenPanelsBtn">Regenerate from Scenes</button>
+  </div>
+  <div class="filmstrip">
+    ${state.panels.map((p,i)=>{
+      const startT = running; running += p.duration;
+      return `
+      <div class="panel-card" data-panel="${p.id}">
+        <div class="panel-img" data-panelimg="${p.id}">
+          <span class="panel-num">${String(i+1).padStart(2,'0')}</span>
+          <span class="panel-dur">${fmtTime(startT)}</span>
+          ${p.image ? `<img src="${p.image}">` : 'No image'}
+        </div>
+        <div class="panel-body">
+          <textarea data-shotdesc="${p.id}">${p.shot}</textarea>
+          <div class="char-tags" data-chartags="${p.id}">
+            ${p.characterIds.map(cid=>{
+              const c = state.characters.find(x=>x.id===cid);
+              return c ? `<span class="char-tag">${c.name}<button data-removechar="${p.id}:${cid}">×</button></span>` : '';
+            }).join('')}
+          </div>
+          <div style="display:flex;gap:6px;">
+            <select class="add-char-select" data-addchar="${p.id}" style="flex:1;">
+              <option value="">+ Tag character</option>
+              ${state.characters.filter(c=>!p.characterIds.includes(c.id)).map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}
+            </select>
+          </div>
+          <div class="panel-actions">
+            <label class="btn small" style="flex:1;text-align:center;">Upload Image<input type="file" accept="image/*" style="display:none;" data-uploadimg="${p.id}"></label>
+            <input type="text" class="mono" data-dur="${p.id}" value="${p.duration}" style="width:50px;background:var(--bg-panel);border:1px solid var(--line);color:var(--text);border-radius:6px;text-align:center;font-size:12px;">
+          </div>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function renderCharactersTab(){
+  return `
+  <div class="sb-toolbar">
+    <h3 style="margin:0;">Character Library</h3>
+    <button class="btn primary small" id="addCharBtn">+ Add Character</button>
+  </div>
+  ${state.characters.length ? `
+  <div class="char-grid">
+    ${state.characters.map(c=>`
+      <div class="char-card">
+        <div class="char-thumb">${c.image?`<img src="${c.image}">`:'No image'}</div>
+        <div class="cname">${c.name}</div>
+        <div class="crole">${c.role||''}</div>
+        <button class="btn small danger" data-delchar="${c.id}">Remove</button>
+      </div>
+    `).join('')}
+  </div>` : `<div class="empty"><div class="display">No characters yet</div>Add your cast so you can tag them consistently across storyboard panels.</div>`}
+  `;
+}
+
+// ---------- Handlers ----------
+function attachProjectHandlers(){
+  document.getElementById('homeBtn').addEventListener('click', ()=>{ view='home'; render(); });
+  document.getElementById('apiKeyBtn').addEventListener('click', showApiKeyModal);
+  document.querySelectorAll('nav.tabs button').forEach(b=>{
+    b.addEventListener('click', ()=>{ state.activeTab = b.dataset.tab; saveProject(); render(); });
+  });
+  document.getElementById('exportBtn').addEventListener('click', exportProject);
+
+  if(state.activeTab==='bible') attachBibleHandlers();
+  if(state.activeTab==='structure') attachStructureHandlers();
+  if(state.activeTab==='script') attachScriptHandlers();
+  if(state.activeTab==='review') attachReviewHandlers();
+  if(state.activeTab==='storyboard') attachStoryboardHandlers();
+  if(state.activeTab==='characters') attachCharacterHandlers();
+}
+
+function attachScriptHandlers(){
+  const ta = document.getElementById('scriptText');
+  ta.addEventListener('input', ()=>{ state.script = ta.value; saveProject(); scheduleIdeaSuggestion(); });
+
+  document.getElementById('formatBtn').addEventListener('click', async ()=>{
+    const btn = document.getElementById('formatBtn');
+    const label = document.getElementById('formatBtnLabel');
+    if(!state.script.trim()){ alert('Write or paste a script first.'); return; }
+    btn.disabled = true; label.innerHTML = '<span class="spin"></span>Formatting…';
+    const fmt = FORMATS.find(f=>f.id===state.formatId);
+    const sys = bibleContextBlock() + `You are a professional script editor for ${fmt.name.toLowerCase()} production. Reformat the user's raw script into clean industry-standard format (scene headings like INT./EXT. LOCATION - TIME, action lines, character cues, dialogue). Then break it into a scene/shot list. Respond ONLY with JSON, no preamble, no markdown fences, in this exact shape:
+{"formattedScript": "...", "scenes": [{"heading":"INT. LOCATION - DAY","action":"...","dialogue":"...","duration": <estimated seconds as integer, based on realistic screen pacing>}]}`;
+    try{
+      const out = await callClaude(sys, state.script, 4000);
+      const parsed = safeParseJSON(out);
+      if(parsed && parsed.scenes){
+        state.script = parsed.formattedScript || state.script;
+        state.scenes = parsed.scenes.map((s,i)=>({id:'sc_'+i+'_'+Date.now(), heading:s.heading||('SCENE '+(i+1)), action:s.action||'', dialogue:s.dialogue||'', duration: s.duration || 10}));
+        saveProject();
+      } else { alert('Could not parse the formatting result. Try again.'); }
+    }catch(e){ alert('Formatting failed: '+e.message); }
+    btn.disabled = false; render();
+  });
+
+  document.getElementById('fitTimeBtn') && document.getElementById('fitTimeBtn').addEventListener('click', async ()=>{
+    const btn = document.getElementById('fitTimeBtn');
+    btn.disabled = true; btn.innerHTML = '<span class="spin"></span>Analyzing…';
+    const fmt = FORMATS.find(f=>f.id===state.formatId);
+    const targetDisplay = fmt.unit==='minutes' ? fmtTime(state.targetSeconds) : Math.round(state.targetSeconds)+'s';
+    const sys = bibleContextBlock() + `You are a script editor helping fit a ${fmt.name.toLowerCase()} to a target runtime of ${targetDisplay}. Given the scene list with current estimated durations (current total: ${fmtTime(totalRuntime())}), suggest specific cuts or expansions per scene to hit the target. Respond ONLY with JSON: {"notes":"one paragraph overview of the strategy","scenes":[{"heading":"...","suggestion":"specific actionable note for this scene","newDuration": <integer seconds>}]}`;
+    const userMsg = JSON.stringify(state.scenes.map(s=>({heading:s.heading, action:s.action, dialogue:s.dialogue, duration:s.duration})));
+    try{
+      const out = await callClaude(sys, userMsg, 2500);
+      const parsed = safeParseJSON(out);
+      if(parsed){
+        let note = `<b>Time-fit strategy:</b> ${parsed.notes||''}<br><br>` + (parsed.scenes||[]).map(s=>`<b>${s.heading}</b> → ${s.suggestion} (suggested ${fmtTime(s.newDuration||0)})`).join('<br>');
+        state.notes.unshift(note);
+        state.activeTab = 'review';
+        saveProject();
+      }
+    }catch(e){ alert('Time-fit analysis failed: '+e.message); }
+    render();
+  });
+
+  document.getElementById('liveSuggestToggle').addEventListener('change', (e)=>{ state.liveSuggestions = e.target.checked; saveProject(); });
+  document.getElementById('refreshIdeasBtn').addEventListener('click', ()=> fetchIdeas(true));
+  document.querySelectorAll('[data-insertidea]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const idea = state.storylineIdeas[parseInt(el.dataset.insertidea)];
+      if(idea){
+        state.script = state.script + (state.script.endsWith('\n')||!state.script ? '' : '\n\n') + idea;
+        saveProject(); render();
+      }
+    });
+  });
+
+  document.getElementById('draftFromFoundationBtn').addEventListener('click', ()=> draftFromFoundation());
+  document.getElementById('sendSelectionBtn').addEventListener('click', sendSelectionToDraft);
+  document.getElementById('draftReviewBtn').addEventListener('click', ()=> submitDraftForReview());
+}
+
+async function draftFromFoundation(){
+  const bibleFilled = state.bible && Object.values(state.bible).some(v=>v && v.trim());
+  const {filled, text: sectionText} = gatherSectionText();
+  const errEl = document.getElementById('draftFoundationError');
+  errEl.innerHTML = '';
+  if(!bibleFilled && !filled.length){
+    errEl.innerHTML = '<p style="color:var(--red);font-size:12px;">Add some details in the Bible or Structure tabs first — even just a few fields — and this will start drafting from them.</p>';
+    return;
+  }
+  const btn = document.getElementById('draftFromFoundationBtn');
+  const label = document.getElementById('draftFromFoundationLabel');
+  const originalLabel = label.innerHTML;
+  btn.disabled = true;
+  label.innerHTML = '<span class="spin"></span>Drafting…';
+  const fmt = FORMATS.find(f=>f.id===state.formatId);
+  const hasScript = state.script && state.script.trim();
+  const sys = bibleContextBlock() + `You are a professional writer working on a ${fmt.name.toLowerCase()}. Using the Character Bible above and any story-structure notes below, ${hasScript ? 'CONTINUE the script that has already been started — pick up naturally from where it leaves off, staying consistent with everything established.' : 'START drafting the opening of the script from scratch.'} Where specific details are not yet decided, make reasonable, consistent creative choices that fit what IS established rather than leaving placeholders — the writer can revise anything later. Write in clean industry-standard script format (scene headings, action lines, character cues, dialogue). Write a natural chunk (roughly a scene's worth), ending at a clean pause point, not the whole rest of the story in one go. Keep language clean (no profanity). Respond with ONLY the script text to add — no preamble, no notes, no repeating what already exists.`;
+  const userMsg = `STORY STRUCTURE NOTES (if any):\n${sectionText || '(none yet)'}\n\nEXISTING SCRIPT SO FAR:\n${hasScript ? state.script.slice(-4000) : '(nothing written yet)'}`;
+  try{
+    let out;
+    try{ out = await callClaude(sys, userMsg, 1500); }
+    catch(firstErr){ label.innerHTML = '<span class="spin"></span>Retrying…'; out = await callClaude(sys, userMsg, 1500); }
+    state.script = (hasScript ? state.script + (state.script.endsWith('\n') ? '' : '\n\n') : '') + out.trim();
+    const ta = document.getElementById('scriptText');
+    if(ta) ta.value = state.script;
+    saveProject();
+  }catch(e){
+    errEl.innerHTML = `<p style="color:var(--red);font-size:12px;">Drafting failed twice: ${e.message}. Try again.</p>`;
+  }
+  btn.disabled = false;
+  label.innerHTML = originalLabel;
+}
+
+function sendSelectionToDraft(){
+  const ta = document.getElementById('scriptText');
+  const start = ta.selectionStart, end = ta.selectionEnd;
+  if(start === end){ alert('Highlight a portion of the script first, then tap this button.'); return; }
+  const selected = state.script.slice(start, end);
+  state.script = state.script.slice(0, start) + state.script.slice(end);
+  ta.value = state.script;
+  const draftInput = document.getElementById('storyDraftInput');
+  draftInput.value = (draftInput.value ? draftInput.value + '\n\n' : '') + selected.trim();
+  saveProject();
+  draftInput.focus();
+}
+
+let draftReview = null;
+
+function placementOptionsHTML(selected){
+  let opts = `<option value="end">End of Script</option><option value="begin">Beginning of Script</option>`;
+  state.scenes.forEach(s=>{
+    opts += `<option value="before:${s.heading}">Before: ${s.heading}</option>`;
+    opts += `<option value="after:${s.heading}">After: ${s.heading}</option>`;
+  });
+  // Re-render with selected marked
+  const container = document.createElement('div');
+  container.innerHTML = opts;
+  container.querySelectorAll('option').forEach(o=>{ if(o.value===selected) o.setAttribute('selected','selected'); });
+  return container.innerHTML;
+}
+
+async function submitDraftForReview(){
+  const input = document.getElementById('storyDraftInput');
+  const draftText = input.value.trim();
+  const errEl = document.getElementById('draftError');
+  const resultsEl = document.getElementById('draftResults');
+  errEl.innerHTML = '';
+  if(!draftText){ errEl.innerHTML = '<p style="color:var(--red);font-size:12px;">Drop something in the box first — an idea, a paragraph, anything you want a take on.</p>'; return; }
+  const btn = document.getElementById('draftReviewBtn');
+  const label = document.getElementById('draftReviewBtnLabel');
+  btn.disabled = true;
+  label.innerHTML = '<span class="spin"></span>Reading it over…';
+  resultsEl.innerHTML = '';
+  const fmt = FORMATS.find(f=>f.id===state.formatId);
+  const sceneList = state.scenes.map(s=>s.heading).join(' | ') || '(no scenes broken out yet)';
+  const sys = bibleContextBlock() + `You are a script editor collaborating with the user on a ${fmt.name.toLowerCase()}. The user will submit a draft — could be a raw idea, a full paragraph, or a chunk of dialogue. You'll also see the script so far and its existing scene headings if any. Decide ONE verdict:
+- "approve": the draft is strong as written and fits well — use it as-is.
+- "fix": the core idea is good but needs revision (tone, pacing, clarity, fit) — provide a revised version.
+- "scrap": this doesn't fit or is weak as a direction — explain why and offer a brief alternative idea instead.
+
+If verdict is approve or fix, also suggest where it best belongs: the beginning of the script, the end, or immediately before/after one of the existing scene headings (use the exact heading text).
+
+Respond ONLY with JSON, no preamble, no markdown fences:
+{"verdict":"approve|fix|scrap","reasoning":"1-2 sentences, direct and specific","revisedText":"the text to use — original if approve, revised if fix, empty string if scrap","suggestedPlacement":"begin|end|before:<exact heading>|after:<exact heading>","alternative":"a brief alternative idea, only if scrap, else empty string"}`;
+  const userMsg = `SCRIPT SO FAR:\n${state.script.slice(-4000) || '(nothing written yet)'}\n\nEXISTING SCENE HEADINGS:\n${sceneList}\n\nUSER'S DRAFT SUBMISSION:\n${draftText}`;
+  try{
+    let out;
+    try{ out = await callClaude(sys, userMsg, 1200); }
+    catch(firstErr){ label.innerHTML = '<span class="spin"></span>Retrying…'; out = await callClaude(sys, userMsg, 1200); }
+    const parsed = safeParseJSON(out);
+    if(parsed && parsed.verdict){
+      draftReview = parsed;
+      draftReview.originalText = draftText;
+      renderDraftResults();
+    } else {
+      errEl.innerHTML = '<p style="color:var(--red);font-size:12px;">Got a response I could not read. Try again.</p>';
+    }
+  }catch(e){
+    errEl.innerHTML = `<p style="color:var(--red);font-size:12px;">Request failed twice: ${e.message}. Your draft is still in the box — try again.</p>`;
+  }
+  btn.disabled = false;
+  label.textContent = 'Send for a Take';
+}
+
+function renderDraftResults(){
+  const resultsEl = document.getElementById('draftResults');
+  if(!resultsEl || !draftReview) return;
+  const v = draftReview.verdict;
+  const badgeClass = v==='approve' ? 'verdict-approve' : v==='fix' ? 'verdict-fix' : 'verdict-scrap';
+  const badgeLabel = v==='approve' ? '✓ Approved' : v==='fix' ? '⚠ Needs a Fix' : '✕ Recommend Scrapping';
+  const textToUse = draftReview.revisedText && draftReview.revisedText.trim() ? draftReview.revisedText : draftReview.originalText;
+  const placement = draftReview.suggestedPlacement || 'end';
+  resultsEl.innerHTML = `
+    <div class="verdict-panel">
+      <div class="verdict-badge ${badgeClass}">${badgeLabel}</div>
+      <div class="verdict-reasoning">${draftReview.reasoning || ''}</div>
+      ${v==='scrap' && draftReview.alternative ? `<div class="verdict-alt">Alternative direction: ${draftReview.alternative}</div>` : ''}
+      <textarea id="draftTextEdit">${textToUse}</textarea>
+      <div class="placement-row">
+        <label>Place it:</label>
+        <select id="placementSelect">${placementOptionsHTML(placement)}</select>
+      </div>
+      <div class="draft-actions">
+        <button class="btn primary small" id="moveToScriptBtn">Move to Script</button>
+        <button class="btn small" id="keepInDraftBtn">Keep Working in Draft</button>
+        <button class="btn small danger" id="discardDraftBtn">Discard</button>
+      </div>
+    </div>`;
+  document.getElementById('moveToScriptBtn').addEventListener('click', ()=>{
+    const text = document.getElementById('draftTextEdit').value.trim();
+    const placementVal = document.getElementById('placementSelect').value;
+    if(!text) return;
+    insertAtPlacement(text, placementVal);
+    document.getElementById('storyDraftInput').value = '';
+    draftReview = null;
+    resultsEl.innerHTML = '';
+    const ta = document.getElementById('scriptText');
+    if(ta) ta.value = state.script;
+    saveProject();
+  });
+  document.getElementById('keepInDraftBtn').addEventListener('click', ()=>{
+    document.getElementById('storyDraftInput').value = document.getElementById('draftTextEdit').value;
+    draftReview = null;
+    resultsEl.innerHTML = '';
+  });
+  document.getElementById('discardDraftBtn').addEventListener('click', ()=>{
+    document.getElementById('storyDraftInput').value = '';
+    draftReview = null;
+    resultsEl.innerHTML = '';
+  });
+}
+
+function insertAtPlacement(text, placement){
+  if(!placement || placement === 'end'){
+    state.script = state.script + (state.script && !state.script.endsWith('\n') ? '\n\n' : '') + text;
+    return;
+  }
+  if(placement === 'begin'){
+    state.script = text + '\n\n' + state.script;
+    return;
+  }
+  const isBefore = placement.startsWith('before:');
+  const heading = placement.slice(placement.indexOf(':')+1);
+  const idx = state.script.indexOf(heading);
+  if(idx === -1){
+    state.script = state.script + (state.script && !state.script.endsWith('\n') ? '\n\n' : '') + text;
+    return;
+  }
+  if(isBefore){
+    state.script = state.script.slice(0, idx) + text + '\n\n' + state.script.slice(idx);
+  } else {
+    const sceneIdx = state.scenes.findIndex(s=>s.heading===heading);
+    let endIdx = state.script.length;
+    if(sceneIdx > -1 && sceneIdx < state.scenes.length - 1){
+      const nextHeading = state.scenes[sceneIdx+1].heading;
+      const nIdx = state.script.indexOf(nextHeading, idx + heading.length);
+      if(nIdx > -1) endIdx = nIdx;
+    }
+    state.script = state.script.slice(0, endIdx).trimEnd() + '\n\n' + text + '\n\n' + state.script.slice(endIdx);
+  }
+}
+
+let ideaTimer = null;
+let ideaFetching = false;
+let lastIdeaScript = '';
+function scheduleIdeaSuggestion(){
+  if(!state.liveSuggestions) return;
+  if(ideaTimer) clearTimeout(ideaTimer);
+  ideaTimer = setTimeout(()=> fetchIdeas(false), 3500);
+}
+async function fetchIdeas(manual){
+  if(!state.script || state.script.trim().split(/\s+/).length < 15){
+    if(manual) alert('Write a bit more first — a few sentences gives better suggestions.');
+    return;
+  }
+  if(ideaFetching) return;
+  if(!manual && state.script === lastIdeaScript) return;
+  ideaFetching = true;
+  lastIdeaScript = state.script;
+  const label = document.getElementById('refreshIdeasLabel');
+  if(label) label.innerHTML = '<span class="spin"></span>Thinking…';
+  const fmt = FORMATS.find(f=>f.id===state.formatId);
+  const sys = bibleContextBlock() + `You are a story editor helping a writer working on a ${fmt.name.toLowerCase()}. Read the script draft so far and suggest 3 short, distinct directions for what could happen next — plot beats, a twist, or a character moment. Each suggestion should be one or two sentences, written as if continuing the story, specific to what's already there (not generic advice). Respond ONLY with a JSON array of 3 strings, no preamble, no markdown fences.`;
+  try{
+    const out = await callClaude(sys, state.script.slice(-4000), 500);
+    let parsed = safeParseJSON(out);
+    if(!Array.isArray(parsed) || !parsed.length){
+      const lines = out.split('\n').map(l=>l.replace(/^[\s\-\*\d\.\)]+/,'').trim()).filter(l=>l.length>10);
+      if(lines.length) parsed = lines.slice(0,3);
+    }
+    if(Array.isArray(parsed) && parsed.length){
+      state.storylineIdeas = parsed.slice(0,3);
+      saveProject();
+      renderIdeasListInPlace();
+    } else {
+      const listEl = document.getElementById('ideasList');
+      if(listEl) listEl.innerHTML = '<p style="color:var(--red);font-size:12px;">Got a response I could not read. Tap Refresh to try again.</p>';
+    }
+  }catch(e){
+    const listEl = document.getElementById('ideasList');
+    if(listEl) listEl.innerHTML = `<p style="color:var(--red);font-size:12px;">${e.message}</p>`;
+  }
+  ideaFetching = false;
+  const label2 = document.getElementById('refreshIdeasLabel');
+  if(label2) label2.textContent = 'Refresh Ideas';
+}
+function renderIdeasListInPlace(){
+  const listEl = document.getElementById('ideasList');
+  if(!listEl) return;
+  listEl.innerHTML = state.storylineIdeas.length ? state.storylineIdeas.map((idea,i)=>`
+        <div class="note-block" style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
+          <span style="flex:1;">${idea}</span>
+          <button class="btn small teal" data-insertidea="${i}">Insert</button>
+        </div>
+      `).join('') : '<p style="color:var(--muted);font-size:13px;">No ideas yet — keep writing or tap Refresh.</p>';
+  listEl.querySelectorAll('[data-insertidea]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const idea = state.storylineIdeas[parseInt(el.dataset.insertidea)];
+      if(idea){
+        const taEl = document.getElementById('scriptText');
+        state.script = state.script + (state.script.endsWith('\n')||!state.script ? '' : '\n\n') + idea;
+        if(taEl) taEl.value = state.script;
+        saveProject();
+      }
+    });
+  });
+}
+
+function attachReviewHandlers(){
+  document.getElementById('reviewBtn').addEventListener('click', async ()=>{
+    const btn = document.getElementById('reviewBtn'); const label = document.getElementById('reviewBtnLabel');
+    btn.disabled = true; label.innerHTML = '<span class="spin"></span>Reviewing…';
+    const sys = bibleContextBlock() + `You are a script editor giving structural notes on a script (pacing, hook strength, clarity, redundancy, dialogue quality). Do not rewrite the text. Give 4-6 concise, specific, actionable bullet notes as plain text, one per line, no markdown symbols.`;
+    try{
+      const out = await callClaude(sys, state.script, 1200);
+      state.notes.unshift(out.split('\n').filter(l=>l.trim()).map(l=>l.replace(/^[-•*]\s*/,'')).join('<br>'));
+      saveProject();
+    }catch(e){ alert('Review failed: '+e.message); }
+    btn.disabled = false; render();
+  });
+  document.getElementById('editBtn').addEventListener('click', async ()=>{
+    const btn = document.getElementById('editBtn'); const label = document.getElementById('editBtnLabel');
+    btn.disabled = true; label.innerHTML = '<span class="spin"></span>Editing…';
+    const sys = bibleContextBlock() + `You are a script editor. Rewrite the given script to improve clarity, pacing, and dialogue quality while preserving the story, characters, and intent. Keep a clean, non-crude tone suitable for family/faith audiences (no profanity). Respond with ONLY the revised script text, nothing else.`;
+    try{
+      const out = await callClaude(sys, state.script, 4000);
+      if(confirm('Replace your script with the AI-edited version? Your previous version will be lost unless you copy it first.')){
+        state.script = out.trim(); saveProject(); state.activeTab = 'script';
+      }
+    }catch(e){ alert('Edit failed: '+e.message); }
+    btn.disabled = false; render();
+  });
+}
+
+function attachStoryboardHandlers(){
+  const genBtn = document.getElementById('genPanelsBtn') || document.getElementById('regenPanelsBtn');
+  if(genBtn) genBtn.addEventListener('click', ()=>{
+    state.panels = state.scenes.map((s,i)=>({id:'pn_'+i+'_'+Date.now(), sceneId:s.id, shot:s.action||s.heading, duration:s.duration||10, characterIds:[], image:null}));
+    saveProject(); render();
+  });
+  document.querySelectorAll('[data-shotdesc]').forEach(el=>{
+    el.addEventListener('input', ()=>{ const p = state.panels.find(p=>p.id===el.dataset.shotdesc); if(p){ p.shot = el.value; saveProject(); } });
+  });
+  document.querySelectorAll('[data-dur]').forEach(el=>{
+    el.addEventListener('change', ()=>{ const p = state.panels.find(p=>p.id===el.dataset.dur); if(p){ p.duration = parseInt(el.value)||p.duration; saveProject(); render(); } });
+  });
+  document.querySelectorAll('[data-addchar]').forEach(el=>{
+    el.addEventListener('change', ()=>{ const p = state.panels.find(p=>p.id===el.dataset.addchar); if(p && el.value){ p.characterIds.push(el.value); saveProject(); render(); } });
+  });
+  document.querySelectorAll('[data-removechar]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const [pid,cid] = el.dataset.removechar.split(':');
+      const p = state.panels.find(p=>p.id===pid);
+      if(p){ p.characterIds = p.characterIds.filter(x=>x!==cid); saveProject(); render(); }
+    });
+  });
+  document.querySelectorAll('[data-uploadimg]').forEach(el=>{
+    el.addEventListener('change', (e)=>{
+      const file = e.target.files[0]; if(!file) return;
+      const reader = new FileReader();
+      reader.onload = ()=>{ const p = state.panels.find(p=>p.id===el.dataset.uploadimg); if(p){ p.image = reader.result; saveProject(); render(); } };
+      reader.readAsDataURL(file);
+    });
+  });
+}
+
+function attachCharacterHandlers(){
+  document.getElementById('addCharBtn').addEventListener('click', showCharModal);
+  document.querySelectorAll('[data-delchar]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      if(confirm('Remove this character?')){
+        state.characters = state.characters.filter(c=>c.id!==el.dataset.delchar);
+        state.panels.forEach(p=> p.characterIds = p.characterIds.filter(id=>id!==el.dataset.delchar));
+        saveProject(); render();
+      }
+    });
+  });
+}
+function showCharModal(){
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal">
+      <h3>Add Character</h3>
+      <div class="field"><label>Name</label><input type="text" id="charName" placeholder="e.g. Zeke"></div>
+      <div class="field"><label>Role / Description</label><input type="text" id="charRole" placeholder="e.g. Hero, 12yo inventor"></div>
+      <div class="field"><label>Reference Image (optional)</label><input type="file" accept="image/*" id="charImage"></div>
+      <div class="row">
+        <button class="btn small" id="cancelChar">Cancel</button>
+        <button class="btn primary small" id="saveChar">Save</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  document.getElementById('cancelChar').addEventListener('click', ()=> overlay.remove());
+  document.getElementById('saveChar').addEventListener('click', ()=>{
+    const name = document.getElementById('charName').value.trim();
+    if(!name){ alert('Name is required.'); return; }
+    const role = document.getElementById('charRole').value.trim();
+    const file = document.getElementById('charImage').files[0];
+    const finish = (imgData)=>{ state.characters.push({id:'ch_'+Date.now(), name, role, image: imgData||null}); saveProject(); overlay.remove(); render(); };
+    if(file){ const reader = new FileReader(); reader.onload = ()=> finish(reader.result); reader.readAsDataURL(file); }
+    else finish(null);
+  });
+}
+
+function exportProject(){
+  const fmt = FORMATS.find(f=>f.id===state.formatId);
+  let running = 0;
+  const lines = ['SHOT LIST — ' + state.title, 'Format: ' + fmt.name, 'Target: ' + (fmt.unit==='minutes'?fmtTime(state.targetSeconds):state.targetSeconds+'s'), ''];
+  (state.scenes||[]).forEach((s,i)=>{
+    lines.push(`${String(i+1).padStart(2,'0')} | ${fmtTime(running)} | ${s.heading}`);
+    lines.push(`   ${s.action||''}`);
+    if(s.dialogue) lines.push(`   DIALOGUE: ${s.dialogue}`);
+    lines.push('');
+    running += s.duration||0;
+  });
+  const blob = new Blob([lines.join('\n')], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (state.title||'script').replace(/[^a-z0-9]/gi,'_') + '_shotlist.txt';
+  a.click();
+
+  const jsonBlob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+  const a2 = document.createElement('a');
+  a2.href = URL.createObjectURL(jsonBlob);
+  a2.download = (state.title||'script').replace(/[^a-z0-9]/gi,'_') + '_project.json';
+  a2.click();
+}
+
+// ---------- Init ----------
+loadAll();
+render();
+</script>
+</body>
+</html>
